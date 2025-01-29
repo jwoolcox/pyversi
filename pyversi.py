@@ -19,7 +19,6 @@ pygame.init()
 # Set up display
 WIDTH, HEIGHT = 600, 600
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Reversi (Othello)')
 
 # Grid size
 GRID_SIZE = 8
@@ -115,6 +114,10 @@ def draw_board(board):
     pygame.display.flip()
 
 
+def draw_player_turn_indicator(player):
+    pygame.display.set_caption(f"{player}'s Turn")
+
+
 def is_valid_move(board, row, col, player):
     if board[row][col] != EMPTY:
         return False
@@ -173,7 +176,7 @@ def play_game():
 
     while True:
         draw_board(board)
-
+        draw_player_turn_indicator(current_player)
         # Check if the current player has any valid moves
         if not has_valid_moves(board, current_player):
             current_player = WHITE if current_player == BLACK else BLACK
