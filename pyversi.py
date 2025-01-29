@@ -48,12 +48,6 @@ def draw_text(text, size, x, y, center=False):
     SCREEN.blit(text_surface, text_rect)
 
 
-def draw_restart_button():
-    pygame.draw.rect(SCREEN, (100, 100, 255),
-                     (WIDTH // 4, HEIGHT // 1.5, WIDTH // 2, 50))
-    draw_text("Restart Game", 30, WIDTH // 2, HEIGHT // 1.5 + 25, center=True)
-
-
 def initialize_game():
     board = initialize_board()
     current_player = BLACK
@@ -63,26 +57,40 @@ def initialize_game():
     return board, current_player, game_over, winner, quit_game
 
 
-def show_start_screen():
-    SCREEN.fill(BACKGROUND_COLOR)
-    draw_text("Reversi (Othello)", 50, WIDTH // 2, HEIGHT // 4, center=True)
-    pygame.draw.rect(SCREEN, (100, 100, 255),
-                     (WIDTH // 4, HEIGHT // 1.5, WIDTH // 2, 50))
-    draw_text("Start Game", 30, WIDTH // 2, HEIGHT // 1.5 + 25, center=True)
-    pygame.display.update()
-
+def show_start_screen(winner=None):
     waiting = True
+    redraw = True
     while waiting:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
-                if WIDTH // 4 <= x <= WIDTH // 4 + WIDTH // 2 and HEIGHT // 1.5 <= y <= HEIGHT // 1.5 + 50:
-                    waiting = False
+                return True
 
-# Draw the grid and pieces
+        if redraw:
+            redraw = False
+            SCREEN.fill(BACKGROUND_COLOR)
+
+            if winner != None:
+                draw_text("Game Over", 50, WIDTH //
+                          2, HEIGHT // 4, center=True)
+                draw_text(f"{winner} wins!", 30, WIDTH //
+                          2, HEIGHT // 2, center=True)
+                pygame.draw.rect(SCREEN, (100, 100, 255),
+                                 (WIDTH // 4, HEIGHT // 1.5, WIDTH // 2, 50))
+                draw_text("Restart Game", 30, WIDTH // 2,
+                          HEIGHT // 1.5 + 25, center=True)
+            else:
+                draw_text("Reversi (Othello)", 50, WIDTH //
+                          2, HEIGHT // 4, center=True)
+                pygame.draw.rect(SCREEN, (100, 100, 255),
+                                 (WIDTH // 4, HEIGHT // 1.5, WIDTH // 2, 50))
+                draw_text("Start Game", 30, WIDTH // 2,
+                          HEIGHT // 1.5 + 25, center=True)
+
+            pygame.display.update()
+            redraw = False
 
 
 def draw_board(board):
@@ -105,8 +113,6 @@ def draw_board(board):
                                    2, row * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 2 - 4)
 
     pygame.display.flip()
-
-# Check if a move is valid
 
 
 def is_valid_move(board, row, col, player):
@@ -131,8 +137,6 @@ def is_valid_move(board, row, col, player):
 
     return False
 
-# Place a move and flip the pieces
-
 
 def place_move(board, row, col, player):
     board[row][col] = player
@@ -155,8 +159,6 @@ def place_move(board, row, col, player):
             r += dr
             c += dc
 
-# Check if there are any valid moves for the player
-
 
 def has_valid_moves(board, player):
     for r in range(GRID_SIZE):
@@ -165,11 +167,8 @@ def has_valid_moves(board, player):
                 return True
     return False
 
-# Main game loop
-
 
 def play_game():
-    show_start_screen()
     board, current_player, game_over, winner, quit_game = initialize_game()
 
     while True:
@@ -205,17 +204,17 @@ def play_game():
 
         # Display the winner message
         if game_over:
-            draw_text(f"Player {winner} Wins!", 50,
-                      WIDTH // 2, HEIGHT // 4, center=True)
-            draw_restart_button()
+            break
 
         pygame.display.update()
 
         if quit_game:
             pygame.quit()
             sys.exit()
+    return winner
 
 
-# Start the game
 if __name__ == "__main__":
-    play_game()
+    winner = None
+    while (show_start_screen(winner)):
+        winner = play_game()
